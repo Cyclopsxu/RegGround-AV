@@ -1,0 +1,109 @@
+{
+  "description": "Hard filter few-shot examples for LLM fallback boundary cases. Each output must match _LLMFilterResponse.",
+  "examples": [
+    {
+      "scenario": "red_light_creeping",
+      "input": {
+        "scene_narrative": "城市交叉口，信号灯保持红灯，自车接近停止线。",
+        "hard_rules": [
+          "[R-SIG-01] 红灯相位下禁止越过停止线"
+        ],
+        "trajectories": [
+          {
+            "trajectory_id": "traj_a",
+            "features": "车辆持续减速但未完全停止；速度 max=3.20, min=0.12, mean=0.82 m/s；冲突区行为: 后半段进入速度 0.70 m/s；后半段最低速度 0.12 m/s；后半段离开速度 0.35 m/s；停止线相对位置从 +0.8m 变为 -0.4m。"
+          }
+        ]
+      },
+      "output": {
+        "results": [
+          {
+            "trajectory_id": "traj_a",
+            "status": "vetoed",
+            "violated_rule_ids": [
+              "R-SIG-01"
+            ],
+            "reason": "红灯保持时 traj_a 未达到完全停止，后半段最低速度仍为 0.12 m/s，且停止线相对位置变为 -0.4m，说明已缓慢越过停止线，违反 [R-SIG-01]。"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "red_light_restart_before_phase_change",
+      "input": {
+        "scene_narrative": "城市交叉口，红灯相位尚未结束，自车曾在停止线前等待。",
+        "hard_rules": [
+          "[R-SIG-01] 红灯相位下禁止越过停止线"
+        ],
+        "trajectories": [
+          {
+            "trajectory_id": "traj_b",
+            "features": "车辆先减速到 0.00 m/s 并短暂停车；速度 max=2.80, min=0.00, mean=0.74 m/s；冲突区行为: 后半段进入速度 0.00 m/s；后半段最低速度 0.00 m/s；后半段离开速度 1.10 m/s；停车点距停止线 +0.2m，随后在红灯仍未结束时越过停止线 0.6m。"
+          }
+        ]
+      },
+      "output": {
+        "results": [
+          {
+            "trajectory_id": "traj_b",
+            "status": "vetoed",
+            "violated_rule_ids": [
+              "R-SIG-01"
+            ],
+            "reason": "traj_b 虽曾停车到 0.00 m/s，但红灯未结束时后半段离开速度升至 1.10 m/s，并从停止线前 +0.2m 移动到停止线后 0.6m，属于停后提前起步越线，违反 [R-SIG-01]。"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "pedestrian_yield_after_clearance",
+      "input": {
+        "scene_narrative": "无保护右转场景，行人先通过人行横道并在自车启动前已离开冲突区。",
+        "hard_rules": [
+          "[R-YLD-01] 行人通过人行横道时必须停车让行"
+        ],
+        "trajectories": [
+          {
+            "trajectory_id": "traj_c",
+            "features": "车辆在人行横道前完全停车等待；速度 max=2.40, min=0.00, mean=0.55 m/s；冲突区行为: 后半段进入速度 0.00 m/s；后半段最低速度 0.00 m/s；后半段离开速度 0.90 m/s；行人离开横道后 1.2s 车辆才开始通过。"
+          }
+        ]
+      },
+      "output": {
+        "results": [
+          {
+            "trajectory_id": "traj_c",
+            "status": "cleared",
+            "violated_rule_ids": [],
+            "reason": "traj_c 在人行横道前最低速度为 0.00 m/s，且车辆启动发生在行人离开横道 1.2s 之后，数值特征支持已完成停车让行，未违反 [R-YLD-01]。"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "insufficient_conflict_zone_evidence",
+      "input": {
+        "scene_narrative": "城市交叉口，自车接近信号控制停止线，但轨迹摘要缺少冲突区穿越信息。",
+        "hard_rules": [
+          "[R-SIG-01] 红灯相位下禁止越过停止线"
+        ],
+        "trajectories": [
+          {
+            "trajectory_id": "traj_d",
+            "features": "车辆从 2.10 m/s 减速至 0.25 m/s；速度 max=2.10, min=0.25, mean=0.90 m/s；冲突区行为: 无；未提供停止线距离、是否越线或信号变化时刻。"
+          }
+        ]
+      },
+      "output": {
+        "results": [
+          {
+            "trajectory_id": "traj_d",
+            "status": "uncertain",
+            "violated_rule_ids": [],
+            "reason": "traj_d 只给出最低速度 0.25 m/s，缺少停止线距离、是否越线和冲突区行为，无法确定是否违反 [R-SIG-01]，因此返回 uncertain。"
+          }
+        ]
+      }
+    }
+  ]
+}

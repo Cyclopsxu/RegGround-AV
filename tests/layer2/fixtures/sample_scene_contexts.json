@@ -1,0 +1,30 @@
+[
+  {
+    "scene_id": "scene-red-light-001",
+    "scenario_type": "red_light",
+    "description": {
+      "keywords": ["红灯", "停止线", "路口"]
+    }
+  },
+  {
+    "scene_id": "scene-pedestrian-001",
+    "scenario_type": "pedestrian",
+    "description": {
+      "keywords": ["行人", "斑马线", "横穿"]
+    }
+  },
+  {
+    "scene_id": "scene-unknown-001",
+    "scenario_type": "unknown",
+    "description": {
+      "keywords": ["正常行驶", "郊区"]
+    }
+  },
+  {
+    "scene_id": "scene-yellow-light-001",
+    "scenario_type": "yellow_light",
+    "description": {
+      "keywords": ["黄灯", "路口"]
+    }
+  }
+]

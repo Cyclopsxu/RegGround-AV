@@ -1,0 +1,77 @@
+{
+  "total_scenes": 8,
+  "total_rules_returned": 14,
+  "hits": 7,
+  "misses": 1,
+  "fabrications": 0,
+  "keyword_fallbacks": 1,
+  "fabrication_rate": 0.0,
+  "hit_rate": 0.875,
+  "fallback_rate": 0.125,
+  "per_scene": [
+    {
+      "scene_id": "bench-red-light",
+      "scenario_type": "red_light",
+      "num_rules": 2,
+      "is_hit": true,
+      "retrieval_mode": "structured",
+      "fabrications_in_scene": 0
+    },
+    {
+      "scene_id": "bench-yellow-light",
+      "scenario_type": "yellow_light",
+      "num_rules": 3,
+      "is_hit": true,
+      "retrieval_mode": "structured",
+      "fabrications_in_scene": 0
+    },
+    {
+      "scene_id": "bench-pedestrian",
+      "scenario_type": "pedestrian",
+      "num_rules": 2,
+      "is_hit": true,
+      "retrieval_mode": "structured",
+      "fabrications_in_scene": 0
+    },
+    {
+      "scene_id": "bench-oncoming",
+      "scenario_type": "oncoming",
+      "num_rules": 2,
+      "is_hit": true,
+      "retrieval_mode": "structured",
+      "fabrications_in_scene": 0
+    },
+    {
+      "scene_id": "bench-minor-road",
+      "scenario_type": "minor_road",
+      "num_rules": 1,
+      "is_hit": true,
+      "retrieval_mode": "structured",
+      "fabrications_in_scene": 0
+    },
+    {
+      "scene_id": "bench-emergency",
+      "scenario_type": "emergency",
+      "num_rules": 1,
+      "is_hit": true,
+      "retrieval_mode": "structured",
+      "fabrications_in_scene": 0
+    },
+    {
+      "scene_id": "bench-unknown-no-match",
+      "scenario_type": "unknown",
+      "num_rules": 0,
+      "is_hit": false,
+      "retrieval_mode": "structured",
+      "fabrications_in_scene": 0
+    },
+    {
+      "scene_id": "bench-unknown-fallback",
+      "scenario_type": "unknown",
+      "num_rules": 3,
+      "is_hit": true,
+      "retrieval_mode": "keyword",
+      "fabrications_in_scene": 0
+    }
+  ]
+}

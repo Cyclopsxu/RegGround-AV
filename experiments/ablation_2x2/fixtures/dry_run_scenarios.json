@@ -1,0 +1,260 @@
+{
+  "protocol_version": "ablation_2x2_v1.0",
+  "gold_finalized": false,
+  "marker": "DRY_RUN",
+  "seed": 42,
+  "scenarios": [
+    {
+      "scene_id": "dry_scene_red",
+      "frame_token": "dry_frame_red_001",
+      "scenario_type": "red_light",
+      "difficulty": "easy",
+      "digest_v_a": "当前方向为红灯相位；自车位于停止线前；路口内未观察到移动行人。",
+      "candidates": [
+        {"trajectory_id": "traj_a", "features": "保持较高速度并越过停止线。"},
+        {"trajectory_id": "traj_b", "features": "在停止线前平稳减速至停车。"}
+      ],
+      "retrieved_rules": [
+        {
+          "rule_id": "R-SIG-01",
+          "code": "RoadTrafficSafetyLaw-38-red",
+          "description": "红灯相位下禁止越过停止线继续行驶"
+        }
+      ],
+      "fake_gold": {
+        "verdicts": [
+          {"trajectory_id": "traj_a", "status": "vetoed"},
+          {"trajectory_id": "traj_b", "status": "cleared"}
+        ],
+        "preference_ranking": ["traj_b", "traj_a"],
+        "chosen_trajectory_id": "traj_b",
+        "preference_pairs": [{"preferred_id": "traj_b", "dispreferred_id": "traj_a"}],
+        "applicable_rule_ids": ["R-SIG-01"],
+        "applicable_provision_keys": ["道路交通安全法:38"]
+      },
+      "dry_run_responses": {
+        "full": [
+          {
+            "verdicts": [
+              {"trajectory_id": "traj_a", "status": "vetoed", "reason": "红灯下越线", "cited_rule_ids": ["R-FAKE-01"]},
+              {"trajectory_id": "traj_b", "status": "cleared", "reason": "停车履行义务", "cited_rule_ids": ["R-SIG-01"]}
+            ],
+            "preference_ranking": ["traj_b", "traj_a"],
+            "chosen_trajectory_id": "traj_b",
+            "preference_pairs": [{"preferred_id": "traj_b", "dispreferred_id": "traj_a", "reason": "停车更合规", "cited_rule_ids": ["R-SIG-01"]}]
+          },
+          {
+            "verdicts": [
+              {"trajectory_id": "traj_a", "status": "vetoed", "reason": "红灯下越线", "cited_rule_ids": ["R-SIG-01"]},
+              {"trajectory_id": "traj_b", "status": "cleared", "reason": "停车履行义务", "cited_rule_ids": ["R-SIG-01"]}
+            ],
+            "preference_ranking": ["traj_b", "traj_a"],
+            "chosen_trajectory_id": "traj_b",
+            "preference_pairs": [{"preferred_id": "traj_b", "dispreferred_id": "traj_a", "reason": "停车更合规", "cited_rule_ids": ["R-SIG-01"]}]
+          }
+        ],
+        "no_validation": [
+          {
+            "verdicts": [
+              {"trajectory_id": "traj_a", "status": "vetoed", "reason": "红灯下越线", "cited_rule_ids": ["R-FAKE-01"]},
+              {"trajectory_id": "traj_b", "status": "cleared", "reason": "停车履行义务", "cited_rule_ids": ["R-SIG-01"]}
+            ],
+            "preference_ranking": ["traj_b", "traj_a"],
+            "chosen_trajectory_id": "traj_b",
+            "preference_pairs": [{"preferred_id": "traj_b", "dispreferred_id": "traj_a", "reason": "停车更合规", "cited_rule_ids": ["R-FAKE-01"]}]
+          }
+        ],
+        "no_rag": [
+          {
+            "verdicts": [
+              {"trajectory_id": "traj_a", "status": "vetoed", "reason": "红灯下越线", "cited_provisions": ["《中华人民共和国道路交通安全法》第999条"]},
+              {"trajectory_id": "traj_b", "status": "cleared", "reason": "停车履行义务", "cited_provisions": ["道路交通安全法第38条"]}
+            ],
+            "preference_ranking": ["traj_b", "traj_a"],
+            "chosen_trajectory_id": "traj_b",
+            "preference_pairs": [{"preferred_id": "traj_b", "dispreferred_id": "traj_a", "reason": "停车更合规", "cited_provisions": ["道路交通安全法第38条"]}]
+          },
+          {
+            "verdicts": [
+              {"trajectory_id": "traj_a", "status": "vetoed", "reason": "红灯下越线", "cited_provisions": ["《中华人民共和国道路交通安全法》第三十八条"]},
+              {"trajectory_id": "traj_b", "status": "cleared", "reason": "停车履行义务", "cited_provisions": ["道路交通安全法第38条"]}
+            ],
+            "preference_ranking": ["traj_b", "traj_a"],
+            "chosen_trajectory_id": "traj_b",
+            "preference_pairs": [{"preferred_id": "traj_b", "dispreferred_id": "traj_a", "reason": "停车更合规", "cited_provisions": ["道路交通安全法第38条"]}]
+          }
+        ],
+        "baseline": [
+          {
+            "verdicts": [
+              {"trajectory_id": "traj_a", "status": "cleared", "reason": "可继续通行", "cited_provisions": ["道路交通安全法第999条"]},
+              {"trajectory_id": "traj_b", "status": "cleared", "reason": "可停车", "cited_provisions": []}
+            ],
+            "preference_ranking": ["traj_a", "traj_b"],
+            "chosen_trajectory_id": "traj_a",
+            "preference_pairs": [{"preferred_id": "traj_a", "dispreferred_id": "traj_b", "reason": "通行效率较高", "cited_provisions": ["道路交通安全法第999条"]}]
+          }
+        ]
+      }
+    },
+    {
+      "scene_id": "dry_scene_pedestrian",
+      "frame_token": "dry_frame_ped_002",
+      "scenario_type": "pedestrian",
+      "difficulty": "medium",
+      "digest_v_a": "前进路径相交的人行横道内有正在移动的行人；自车接近横道。",
+      "candidates": [
+        {"trajectory_id": "traj_a", "features": "接近横道时减速并在行人前停车。"},
+        {"trajectory_id": "traj_b", "features": "保持速度通过行人所在横道。"}
+      ],
+      "retrieved_rules": [
+        {
+          "rule_id": "R-YLD-01",
+          "code": "RoadTrafficSafetyLaw-47-pedestrian",
+          "description": "行人正在人行横道通过时机动车必须停车让行"
+        }
+      ],
+      "fake_gold": {
+        "verdicts": [
+          {"trajectory_id": "traj_a", "status": "cleared"},
+          {"trajectory_id": "traj_b", "status": "vetoed"}
+        ],
+        "preference_ranking": ["traj_a", "traj_b"],
+        "chosen_trajectory_id": "traj_a",
+        "preference_pairs": [{"preferred_id": "traj_a", "dispreferred_id": "traj_b"}],
+        "applicable_rule_ids": ["R-YLD-01"],
+        "applicable_provision_keys": ["道路交通安全法:47"]
+      },
+      "dry_run_responses": {
+        "full": [
+          {
+            "verdicts": [
+              {"trajectory_id": "traj_a", "status": "cleared", "reason": "已停车让行", "cited_rule_ids": ["R-YLD-01"]},
+              {"trajectory_id": "traj_b", "status": "vetoed", "reason": "未让行", "cited_rule_ids": ["R-YLD-01"]}
+            ],
+            "preference_ranking": ["traj_a", "traj_b"],
+            "chosen_trajectory_id": "traj_a",
+            "preference_pairs": [{"preferred_id": "traj_a", "dispreferred_id": "traj_b", "reason": "让行更合规", "cited_rule_ids": ["R-YLD-01"]}]
+          }
+        ],
+        "no_validation": [
+          {
+            "verdicts": [
+              {"trajectory_id": "traj_a", "status": "cleared", "reason": "已停车让行", "cited_rule_ids": ["R-YLD-01"]},
+              {"trajectory_id": "traj_b", "status": "vetoed", "reason": "未让行", "cited_rule_ids": ["R-YLD-01"]}
+            ],
+            "preference_ranking": ["traj_a", "traj_b"],
+            "chosen_trajectory_id": "traj_a",
+            "preference_pairs": [{"preferred_id": "traj_a", "dispreferred_id": "traj_b", "reason": "让行更合规", "cited_rule_ids": ["R-YLD-01"]}]
+          }
+        ],
+        "no_rag": [
+          {
+            "verdicts": [
+              {"trajectory_id": "traj_a", "status": "cleared", "reason": "已停车让行", "cited_provisions": ["道路交通安全法第47条"]},
+              {"trajectory_id": "traj_b", "status": "vetoed", "reason": "未让行", "cited_provisions": ["《中华人民共和国道路交通安全法》第四十七条"]}
+            ],
+            "preference_ranking": ["traj_a", "traj_b"],
+            "chosen_trajectory_id": "traj_a",
+            "preference_pairs": [{"preferred_id": "traj_a", "dispreferred_id": "traj_b", "reason": "让行更合规", "cited_provisions": ["道路交通安全法第47条"]}]
+          }
+        ],
+        "baseline": [
+          {
+            "verdicts": [
+              {"trajectory_id": "traj_a", "status": "cleared", "reason": "已让行", "cited_provisions": ["道路交通安全法第47条"]},
+              {"trajectory_id": "traj_b", "status": "uncertain", "reason": "风险较高", "cited_provisions": ["道路交通安全法第47条"]}
+            ],
+            "preference_ranking": ["traj_a", "traj_b"],
+            "chosen_trajectory_id": "traj_a",
+            "preference_pairs": [{"preferred_id": "traj_a", "dispreferred_id": "traj_b", "reason": "停车更稳妥", "cited_provisions": ["道路交通安全法第47条"]}]
+          }
+        ]
+      }
+    },
+    {
+      "scene_id": "dry_scene_oncoming",
+      "frame_token": "dry_frame_oncoming_003",
+      "scenario_type": "oncoming",
+      "difficulty": "hard",
+      "digest_v_a": "自车拟左转；对向存在保持直行的移动车辆；两车路径存在冲突。",
+      "candidates": [
+        {"trajectory_id": "traj_a", "features": "左转前减速并等待对向车辆通过。"},
+        {"trajectory_id": "traj_b", "features": "未等待对向车辆即开始左转。"}
+      ],
+      "retrieved_rules": [
+        {
+          "rule_id": "R-YLD-02",
+          "code": "RoadTrafficSafetyLaw-52-left-turn-yield",
+          "description": "左转车辆须让行对向直行车辆"
+        }
+      ],
+      "fake_gold": {
+        "verdicts": [
+          {"trajectory_id": "traj_a", "status": "cleared"},
+          {"trajectory_id": "traj_b", "status": "vetoed"}
+        ],
+        "preference_ranking": ["traj_a", "traj_b"],
+        "chosen_trajectory_id": "traj_a",
+        "preference_pairs": [{"preferred_id": "traj_a", "dispreferred_id": "traj_b"}],
+        "applicable_rule_ids": ["R-YLD-02"],
+        "applicable_provision_keys": ["道路交通安全法:52"]
+      },
+      "dry_run_responses": {
+        "full": [
+          {
+            "verdicts": [
+              {"trajectory_id": "traj_a", "status": "cleared", "reason": "已让行", "cited_rule_ids": ["R-YLD-02"]},
+              {"trajectory_id": "traj_b", "status": "vetoed", "reason": "未让行", "cited_rule_ids": ["R-YLD-02"]}
+            ],
+            "preference_ranking": ["traj_a", "traj_b"],
+            "chosen_trajectory_id": "traj_a",
+            "preference_pairs": [{"preferred_id": "traj_a", "dispreferred_id": "traj_b", "reason": "等待更合规", "cited_rule_ids": ["R-YLD-02"]}]
+          }
+        ],
+        "no_validation": [
+          {
+            "verdicts": [
+              {"trajectory_id": "traj_a", "status": "cleared", "reason": "已让行", "cited_rule_ids": ["R-YLD-02"]},
+              {"trajectory_id": "traj_b", "status": "vetoed", "reason": "未让行", "cited_rule_ids": ["R-FAKE-52"]}
+            ],
+            "preference_ranking": ["traj_a", "traj_b"],
+            "chosen_trajectory_id": "traj_a",
+            "preference_pairs": [{"preferred_id": "traj_a", "dispreferred_id": "traj_b", "reason": "等待更合规", "cited_rule_ids": ["R-FAKE-52"]}]
+          }
+        ],
+        "no_rag": [
+          {
+            "verdicts": [
+              {"trajectory_id": "traj_a", "status": "cleared", "reason": "已让行", "cited_provisions": ["道路交通安全法第52条"]},
+              {"trajectory_id": "traj_b", "status": "vetoed", "reason": "未让行", "cited_provisions": ["道路交通安全法第888条"]}
+            ],
+            "preference_ranking": ["traj_a", "traj_b"],
+            "chosen_trajectory_id": "traj_a",
+            "preference_pairs": [{"preferred_id": "traj_a", "dispreferred_id": "traj_b", "reason": "等待更合规", "cited_provisions": ["道路交通安全法第52条"]}]
+          },
+          {
+            "verdicts": [
+              {"trajectory_id": "traj_a", "status": "cleared", "reason": "已让行", "cited_provisions": ["道路交通安全法第52条"]},
+              {"trajectory_id": "traj_b", "status": "vetoed", "reason": "未让行", "cited_provisions": ["《中华人民共和国道路交通安全法》第五十二条"]}
+            ],
+            "preference_ranking": ["traj_a", "traj_b"],
+            "chosen_trajectory_id": "traj_a",
+            "preference_pairs": [{"preferred_id": "traj_a", "dispreferred_id": "traj_b", "reason": "等待更合规", "cited_provisions": ["道路交通安全法第52条"]}]
+          }
+        ],
+        "baseline": [
+          {
+            "verdicts": [
+              {"trajectory_id": "traj_a", "status": "cleared", "reason": "等待安全", "cited_provisions": ["道路交通安全法第77条"]},
+              {"trajectory_id": "traj_b", "status": "cleared", "reason": "可完成左转", "cited_provisions": []}
+            ],
+            "preference_ranking": ["traj_b", "traj_a"],
+            "chosen_trajectory_id": "traj_b",
+            "preference_pairs": [{"preferred_id": "traj_b", "dispreferred_id": "traj_a", "reason": "更快完成转向", "cited_provisions": ["道路交通安全法第77条"]}]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "description": "Pairwise preference ranker few-shot examples. Preferred IDs must come from the current comparison only.",
+  "examples": [
+    {
+      "scenario": "red_light_margin_a_preferred",
+      "input": {
+        "scene_narrative": "红灯等待场景，两条轨迹均已通过硬性过滤。",
+        "active_rules": [
+          "[R-SIG-03] 建议在停止线前预留安全制动距离"
+        ],
+        "trajectories": [
+          {
+            "trajectory_id": "traj_a",
+            "features": "车辆从 3.50 m/s 提前平稳减速，在停止线前 5.2m 处完全停止；mean_speed=1.20 m/s；横向偏移 0.05m。"
+          },
+          {
+            "trajectory_id": "traj_b",
+            "features": "车辆从 4.00 m/s 接近停止线，在停止线前 1.0m 处急减速至停止；mean_speed=1.85 m/s；横向偏移 0.04m。"
+          }
+        ]
+      },
+      "output": {
+        "preferred_id": "traj_a",
+        "dispreferred_id": "traj_b",
+        "confidence": 0.86,
+        "reasoning": "traj_a 在停止线前 5.2m 完全停止，相比 traj_b 的 1.0m 急减速保留更大安全制动距离。",
+        "referenced_rule_ids": [
+          "R-SIG-03"
+        ]
+      }
+    },
+    {
+      "scenario": "pedestrian_yield_b_preferred",
+      "input": {
+        "scene_narrative": "行人横穿后，两条轨迹均已通过硬性过滤，需要比较防御性驾驶偏好。",
+        "active_rules": [
+          "[R-YLD-03] 建议在人行横道前保持充分观察时间和启动余量"
+        ],
+        "trajectories": [
+          {
+            "trajectory_id": "traj_a",
+            "features": "车辆在人行横道前停车，行人离开横道后 0.4s 启动；后半段离开速度 1.30 m/s；mean_speed=0.92 m/s。"
+          },
+          {
+            "trajectory_id": "traj_b",
+            "features": "车辆在人行横道前停车，行人离开横道后 1.6s 启动；后半段离开速度 0.80 m/s；mean_speed=0.61 m/s。"
+          }
+        ]
+      },
+      "output": {
+        "preferred_id": "traj_b",
+        "dispreferred_id": "traj_a",
+        "confidence": 0.82,
+        "reasoning": "traj_b 在行人离开后等待 1.6s 且启动速度更低，比 traj_a 的 0.4s 启动更保守。",
+        "referenced_rule_ids": [
+          "R-YLD-03"
+        ]
+      }
+    },
+    {
+      "scenario": "no_soft_rule_defensive_reasoning",
+      "input": {
+        "scene_narrative": "低速汇入场景，两条轨迹均已通过硬性过滤，本次没有可引用软性 rule_id。",
+        "active_rules": [],
+        "trajectories": [
+          {
+            "trajectory_id": "traj_a",
+            "features": "车辆以 1.80 m/s 平稳汇入，最大横向偏移 0.15m，速度变化幅度 0.40 m/s。"
+          },
+          {
+            "trajectory_id": "traj_b",
+            "features": "车辆以 2.60 m/s 汇入，最大横向偏移 0.55m，速度变化幅度 1.20 m/s。"
+          }
+        ]
+      },
+      "output": {
+        "preferred_id": "traj_a",
+        "dispreferred_id": "traj_b",
+        "confidence": 0.74,
+        "reasoning": "traj_a 的汇入速度更低、横向偏移和速度波动更小，整体更平稳。",
+        "referenced_rule_ids": []
+      }
+    }
+  ]
+}

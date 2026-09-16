@@ -1,0 +1,105 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rag-av1"
+version = "0.1.0"
+description = "GraphRAG-based autonomous driving trajectory preference audit pipeline."
+requires-python = ">=3.12"
+readme = "README.md"
+keywords = [
+    "rag",
+    "graphrag",
+    "autonomous-driving",
+    "nuscenes",
+    "drivelm",
+    "trajectory-audit",
+]
+dependencies = [
+    # ── 数据模型（三层通用）────────────────────────
+    "pydantic>=2.5,<3.0",
+    "pydantic-settings>=2.0,<3.0",
+
+    # ── Layer 1：数据解析 ──────────────────────────
+    # numpy 保持 <2.0 以兼容 nuscenes-devkit；如升级 devkit 后确认兼容可放开
+    "numpy>=1.26,<2.0",
+    "nuscenes-devkit>=1.2.0",
+
+    # ── Layer 2：图谱检索 ──────────────────────────
+    "networkx>=3.0,<4.0",
+    "pyyaml>=6.0",
+
+    # ── Layer 3：LLM 裁判 ──────────────────────────
+    # 二选一使用，两个都装方便切换
+    "anthropic>=0.100.0",
+    "openai>=2.0.0",
+    "tenacity>=8.0",              # LLM 调用重试
+]
+
+[project.optional-dependencies]
+dev = [
+    # 测试框架
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "pytest-mock>=3.12",
+    "pytest-benchmark>=4.0",      # Layer 2 性能基准
+    "pytest-recording>=0.13",     # Layer 3 VCR：录制 LLM 响应供离线重放
+
+    # 类型检查与 lint
+    "mypy>=1.10",
+    "ruff>=0.4",
+    "types-PyYAML",               # mypy stubs for pyyaml
+]
+
+# ── 包发现（src/ 目录建好后取消注释）────────────────────
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# ── pytest ───────────────────────────────────────────
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts   = "--tb=short -v"
+
+# ── 覆盖率 ──────────────────────────────────────────
+[tool.coverage.run]
+source = ["src"]
+branch = true
+
+[tool.coverage.report]
+fail_under   = 85       # 文档要求行覆盖率 ≥ 85%
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+]
+
+# ── mypy ─────────────────────────────────────────────
+[tool.mypy]
+strict         = true   # 文档要求 mypy --strict 零 error
+python_version = "3.12"
+files          = ["src"]
+
+[[tool.mypy.overrides]]
+# nuscenes-devkit 无 py.typed，忽略它的类型缺失
+module = ["nuscenes.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["networkx.*"]
+ignore_missing_imports = true
+
+# ── ruff ─────────────────────────────────────────────
+[tool.ruff]
+target-version = "py312"
+line-length    = 100
+
+[tool.ruff.lint]
+select = [
+    "E", "W",   # pycodestyle
+    "F",         # pyflakes
+    "I",         # isort
+    "UP",        # pyupgrade
+    "B",         # flake8-bugbear
+    "SIM",       # flake8-simplify
+]

@@ -1,0 +1,131 @@
+# Layer 2 法规图谱定义（v3.0 MVP）
+
+graph_version: "2026-07-v3.1"
+
+conditions:
+  - id: C-RED-PHASE
+    description: 当前方向为红灯相位
+    keywords: ["red light", "traffic light", "red signal", "stop line"]
+    fact_keys: ["has_red_light"]
+  - id: C-YELLOW-PHASE
+    description: 当前方向为黄灯相位
+    keywords: ["yellow light", "amber light", "yellow signal"]
+    fact_keys: ["has_yellow_light"]
+  - id: C-PED-IN-CROSSWALK
+    description: 人行横道内有正在通过的行人
+    keywords: ["pedestrian", "crosswalk", "crossing", "zebra crossing"]
+    fact_keys: ["pedestrian_in_crosswalk"]
+  - id: C-ONCOMING-STRAIGHT
+    description: 本车转向路径与对向移动车辆冲突
+    keywords: ["oncoming", "opposite direction", "left turn", "yield"]
+    fact_keys: ["oncoming_vehicle_moving"]
+  - id: C-ON-MINOR-ROAD
+    description: 本车由支路或让行路段汇入主路
+    keywords: ["minor road", "side road", "merge", "main road"]
+    fact_keys: ["ego_on_minor_road"]
+behaviors:
+  - id: B-CROSS-STOPLINE
+    description: 越过停止线继续行驶
+  - id: B-ACCELERATE-THROUGH
+    description: 加速抢行通过路口
+  - id: B-FAIL-YIELD
+    description: 未停车/未减速让行
+  - id: B-CONFIRM-SAFETY
+    description: 未确认路口安全即通行
+  - id: B-YIELD-EMERGENCY
+    description: 为执行任务的特种车辆让行
+
+actors:
+  - id: A-VEHICLE
+    type: vehicle
+    description: 机动车
+    priority_level: 3
+  - id: A-PEDESTRIAN
+    type: pedestrian
+    description: 行人
+    priority_level: 5
+  - id: A-EMERGENCY
+    type: emergency_vehicle
+    description: 特种车辆
+    priority_level: 5
+
+consequences:
+  - id: K-SIGNAL
+    type: signal_violation
+    description: 信号灯违法记6分罚款200元
+    severity_score: 9
+  - id: K-YIELD
+    type: yield_violation
+    description: 未让行记3分罚款100元
+    severity_score: 7
+
+rules:
+  - id: R-SIG-01
+    code: "RoadTrafficSafetyLaw-38-red"
+    description: 红灯相位下禁止越过停止线继续行驶
+    severity: hard
+    category: signal
+    applies_when: [C-RED-PHASE]
+    prohibits: [B-CROSS-STOPLINE]
+    applies_to: [A-VEHICLE]
+    consequences: [K-SIGNAL]
+
+  - id: R-SIG-02
+    code: "RoadTrafficSafetyLaw-38-yellow"
+    description: 黄灯相位下禁止加速抢行通过路口
+    severity: hard
+    category: signal
+    applies_when: [C-YELLOW-PHASE]
+    prohibits: [B-ACCELERATE-THROUGH]
+    applies_to: [A-VEHICLE]
+    consequences: [K-SIGNAL]
+
+  - id: R-SIG-03
+    code: "RoadTrafficSafetyLaw-38-safe-check"
+    description: 通行前须确认路口安全（防御性驾驶）
+    severity: soft
+    category: signal
+    applies_when: [C-RED-PHASE, C-YELLOW-PHASE]
+    prohibits: [B-CONFIRM-SAFETY]
+    applies_to: [A-VEHICLE]
+    consequences: [K-SIGNAL]
+
+  - id: R-YLD-01
+    code: "RoadTrafficSafetyLaw-47-pedestrian"
+    description: 行人正在人行横道通过时机动车必须停车让行
+    severity: hard
+    category: yield
+    applies_when: [C-PED-IN-CROSSWALK]
+    prohibits: [B-FAIL-YIELD]
+    applies_to: [A-VEHICLE, A-PEDESTRIAN]
+    consequences: [K-YIELD]
+
+  - id: R-YLD-02
+    code: "RoadTrafficSafetyLaw-52-left-turn-yield"
+    description: 左转车辆须让行对向直行车辆
+    severity: hard
+    category: yield
+    applies_when: [C-ONCOMING-STRAIGHT]
+    prohibits: [B-FAIL-YIELD]
+    applies_to: [A-VEHICLE]
+    consequences: [K-YIELD]
+
+  - id: R-YLD-03
+    code: "RoadTrafficSafetyLaw-53-minor-road"
+    description: 支路车辆驶入主路时须让行主路车辆
+    severity: hard
+    category: yield
+    applies_when: [C-ON-MINOR-ROAD]
+    prohibits: [B-FAIL-YIELD]
+    applies_to: [A-VEHICLE]
+    consequences: [K-YIELD]
+
+  - id: R-YLD-05
+    code: "RoadTrafficSafetyLaw-47-safe-distance"
+    description: 让行时须预留充分安全间距（防御性驾驶）
+    severity: soft
+    category: yield
+    applies_when: [C-PED-IN-CROSSWALK, C-ONCOMING-STRAIGHT]
+    prohibits: [B-FAIL-YIELD]
+    applies_to: [A-VEHICLE, A-PEDESTRIAN]
+    consequences: [K-YIELD]

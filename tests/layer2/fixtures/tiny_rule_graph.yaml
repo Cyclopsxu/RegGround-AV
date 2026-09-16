@@ -1,0 +1,84 @@
+# 测试用最小法规图谱（v3.0）
+
+graph_version: "test-v3.0"
+
+conditions:
+  - id: C-RED-PHASE
+    description: 当前方向为红灯相位
+    keywords: ["red light", "traffic light", "stop line"]
+    fact_keys: ["has_red_light"]
+  - id: C-PED-IN-CROSSWALK
+    description: 人行横道内有正在通过的行人
+    keywords: ["pedestrian", "crosswalk", "zebra crossing"]
+    fact_keys: ["pedestrian_in_crosswalk"]
+  - id: C-EMERGENCY-ACTIVE
+    description: 执行任务的特种车辆正在通行
+    keywords: ["ambulance", "emergency vehicle", "siren"]
+    fact_keys: ["emergency_vehicle_active"]
+
+behaviors:
+  - id: B-CROSS-STOPLINE
+    description: 越过停止线继续行驶
+  - id: B-FAIL-YIELD
+    description: 未停车/未减速让行
+  - id: B-YIELD-EMERGENCY
+    description: 为执行任务的特种车辆让行
+
+actors:
+  - id: A-VEHICLE
+    type: vehicle
+    description: 机动车
+    priority_level: 3
+  - id: A-PEDESTRIAN
+    type: pedestrian
+    description: 行人
+    priority_level: 5
+  - id: A-EMERGENCY
+    type: emergency_vehicle
+    description: 特种车辆
+    priority_level: 5
+
+consequences:
+  - id: K-SIGNAL
+    type: signal_violation
+    description: 信号灯违法记6分罚款
+    severity_score: 9
+  - id: K-YIELD
+    type: yield_violation
+    description: 未让行记3分罚款
+    severity_score: 7
+
+rules:
+  - id: R-SIG-01
+    code: "RoadTrafficSafetyLaw-38-red"
+    description: 红灯相位下禁止越过停止线继续行驶
+    severity: hard
+    category: signal
+    applies_when: [C-RED-PHASE]
+    prohibits: [B-CROSS-STOPLINE]
+    applies_to: [A-VEHICLE]
+    consequences: [K-SIGNAL]
+
+  - id: R-YLD-01
+    code: "RoadTrafficSafetyLaw-47-pedestrian"
+    description: 行人正在人行横道通过时机动车必须停车让行
+    severity: hard
+    category: yield
+    applies_when: [C-PED-IN-CROSSWALK]
+    prohibits: [B-FAIL-YIELD]
+    applies_to: [A-VEHICLE, A-PEDESTRIAN]
+    consequences: [K-YIELD]
+
+  - id: R-YLD-04
+    code: "RoadTrafficSafetyLaw-53-emergency"
+    description: 遇执行任务的特种车辆应当让行
+    severity: hard
+    category: yield
+    applies_when: [C-EMERGENCY-ACTIVE]
+    requires: [B-YIELD-EMERGENCY]
+    applies_to: [A-VEHICLE, A-EMERGENCY]
+    consequences: [K-YIELD]
+    overrides:
+      - rule_id: R-SIG-01
+        condition: C-EMERGENCY-ACTIVE
+        description: emergency priority overrides red-light waiting
